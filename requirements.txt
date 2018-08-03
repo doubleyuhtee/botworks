@@ -1,0 +1,4 @@
+flask
+pytesseract
+slackclient==1.0.0
+Pillow
