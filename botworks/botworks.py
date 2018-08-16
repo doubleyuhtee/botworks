@@ -4,6 +4,7 @@ import time
 from typing import List
 
 from botworks.channel.Channel import Channel
+from botworks.config_constants import SLEEP_TIME, ERROR_SLEEP_TIME, LOG_LEVEL, HEALTHY_HANDLER, UNHEALTHY_HANDLER
 from botworks.slack.Clack import Clack
 from botworks.slack.MessageHandler import MessageHandler
 
@@ -15,12 +16,18 @@ class Botworks:
     def __init__(self, bot_token, bot_name, channels: List[Channel], config=None):
         if config is None:
             config = {}
+        if not config[SLEEP_TIME]:
+            config[SLEEP_TIME] = 5
+        if not config[ERROR_SLEEP_TIME]:
+            config[ERROR_SLEEP_TIME] = 10
+        if not config[LOG_LEVEL]:
+            config[LOG_LEVEL] = logging.WARNING
         self.botToken = bot_token
         self.botName = bot_name
         self.channels = channels
         self.conf = config
-        if config and 'log_level' in config:
-            log.setLevel(config['log_level'])
+        self.healthy = True
+        log.setLevel(config[LOG_LEVEL])
         for c in self.channels:
             for r in c.responses:
                 r.finalize(self.conf)
@@ -38,8 +45,16 @@ class Botworks:
         while True:
             try:
                 message_handler.parse_slack_output(clacker.read())
-                time.sleep(self.conf["sleep_time"])
+                if not self.healthy:
+                    self.healthy = True
+                    if self.conf[HEALTHY_HANDLER]:
+                        self.conf[HEALTHY_HANDLER]()
+                time.sleep(self.conf[SLEEP_TIME])
             except Exception as e:
                 log.error("Major error")
                 log.error(e)
-                time.sleep(self.conf["error_sleep_time"])
+                self.healthy = False
+
+                if self.conf[UNHEALTHY_HANDLER]:
+                    self.conf[UNHEALTHY_HANDLER](error=e)
+                time.sleep(self.conf[ERROR_SLEEP_TIME])

@@ -2,13 +2,16 @@ import random
 
 
 class Response:
-    def __init__(self, text=None, emoji=None, ghostly=None, threaded=None):
+    def __init__(self, text=None, emoji=None, ghostly=None, threaded=None, method=None):
         self.text = text
         self.emojis = emoji
         self.ghostly = ghostly
         self.threaded_response = threaded
+        self.method = method
 
     def respond(self, client, payload):
+        if self.method:
+            self.method(client=client, payload=payload)
         if self.text:
             client.post_message(channel=payload.channel, message=self.get_response_value(self.text))
         if self.emojis:

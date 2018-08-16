@@ -1,8 +1,11 @@
+from botworks.chat.Response import Response
+from botworks.chat.InteractionDefinition import InteractionDefinition, Or
+
 messages = [
-    ResponseDefinition(
+    InteractionDefinition(
         trigger_definition=Or("spoiler"),
         mod_exempt=False,
-        cooldown_duration=3600,
+        cooldown_duration_seconds=3600,
         response=Response(
             text=["Rosebud was his sled", "Snape kills Dumbledore",
                   "Bruce Willis was dead the whole time", "Water kills the aliens",
@@ -21,17 +24,10 @@ messages = [
                   "Sergean Howie was lured to the island as a sacrifice", "Deckard was a replicant... maybe",
                   "Everyone on the island is dead and trapped in some sort of time-travelling purgatory"])
     ),
-    ResponseDefinition(
+    InteractionDefinition(
         trigger_definition=Or("night king", "nightking"),
         mod_exempt=False,
-        cooldown_duration=0,
+        cooldown_duration_seconds=0,
         response=Response(emoji="nightking")
     )
 ]
-
-Botworks(str(os.environ.get('SLACK_BOT_TOKEN')),
-         str(os.environ.get('SLACK_BOT_NAME')),
-         [Channel("gameofthrones", [], messages)],
-         config={"log_level": logging.WARNING,
-                 "sleep_time": 5, "error_sleep_time": 5}) \
-    .listen()

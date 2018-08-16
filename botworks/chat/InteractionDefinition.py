@@ -4,23 +4,23 @@ import time
 import logging
 from typing import List
 
+from botworks.config_constants import LOG_LEVEL
 from botworks.slack.Payload import Payload
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
-class ResponseDefinition:
+class InteractionDefinition:
     def __init__(self, trigger_definition=None, response=None, as_thread=True,
-                 custom_response=None, custom_matcher=None, cooldown_duration=600,
+                 custom_matcher=None, cooldown_duration_seconds=600,
                  full_text=None, mod_exempt=True, event=None):
         self.triggerWords = trigger_definition
         self.response = response
         self.asThread = as_thread
-        self.cooldown_duration = cooldown_duration
+        self.cooldown_duration_seconds = cooldown_duration_seconds
         self.cooldown_end = 0
         self.fullText = full_text
-        self.responseMethod = custom_response
         self.matchMethod = custom_matcher
         self.modExempt = mod_exempt
         self.conf = {}
@@ -28,7 +28,7 @@ class ResponseDefinition:
 
     def finalize(self, config):
         self.conf = config
-        log.setLevel(self.conf['log_level'])
+        log.setLevel(config[LOG_LEVEL])
 
     def check(self, payload: Payload, mod_ids: List[str]) -> bool:
         log.info("Checking for response " + str(self.response))
@@ -48,11 +48,8 @@ class ResponseDefinition:
     def respond(self, clacker, payload: Payload):
         if time.time() < self.cooldown_end:
             return
-        self.cooldown_end = time.time() + self.cooldown_duration
-        if self.responseMethod:
-            self.responseMethod(clacker, payload)
-        else:
-            self.response.respond(clacker, payload)
+        self.cooldown_end = time.time() + self.cooldown_duration_seconds
+        self.response.respond(clacker, payload)
 
 
 class And:
