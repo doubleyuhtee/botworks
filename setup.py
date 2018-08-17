@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="botworks",
-    version="0.0.3",
+    version="0.1.0",
     author="William Hanson",
     author_email="42045551+doubleyuhtee@users.noreply.github.com",
     description="Slack bot framework",
