@@ -17,7 +17,7 @@ class Trigger:
 
     def check(self, payload: Payload):
         if self.matchMethod:
-            return self.matchMethod(payload)
+            return self.matchMethod.check(payload)
         if self.event == payload.event_type:
             return True
         if self.fullText and payload.imageText and \
