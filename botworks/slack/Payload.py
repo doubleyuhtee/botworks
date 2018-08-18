@@ -13,7 +13,19 @@ log.setLevel(logging.INFO)
 
 
 class Payload:
-    def __init__(self, rtm_message, bot_id: str, bot_token: str):
+    def __init__(self):
+        self.user = None
+        self.raw = None
+        self.lower_message = None
+        self.event_type = None
+        self.channel = None
+        self.timestamp = None
+        self.is_direct_message = None
+        self.isTargetedMessage = None
+        self.imageText = None
+        self.sharedMessage = None
+
+    def finalize(self, rtm_message, bot_id: str, bot_token: str):
         self.raw = rtm_message
         self.user = rtm_message['user']
         self.lower_message = rtm_message['text'].lower() if 'text' in rtm_message else ""
@@ -49,14 +61,15 @@ class Payload:
 
         if 'attachments' in rtm_message and len(rtm_message['attachments']) > 0:
             self.sharedMessage = rtm_message['attachments'][0]
-        self.sharedMessage = None
+        else:
+            self.sharedMessage = None
 
 
 class PayloadFactory:
     def __init__(self, bot_id: str, bot_token: str, config=None):
         if config is None:
             config = {}
-        self.config = config
+        self.__config = config
         self.__botId = bot_id
         self.__botToken = bot_token
         if 'log_level' in config:
@@ -65,7 +78,7 @@ class PayloadFactory:
     def parse_payload(self, message):
         if self.valid_message(message):
             log.debug(message)
-            return Payload(message, self.__botId, self.__botToken)
+            return Payload().finalize(message, self.__botId, self.__botToken)
         return None
 
     @staticmethod
