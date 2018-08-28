@@ -2,7 +2,7 @@ import logging
 import time
 from typing import List
 
-from botworks.chat.Response import Response
+from botworks.chat.Response import IResponse
 from botworks.chat.Trigger import Trigger
 from botworks.config_constants import LOG_LEVEL
 from botworks.slack.Payload import Payload
@@ -12,7 +12,7 @@ log.setLevel(logging.INFO)
 
 
 class InteractionDefinition:
-    def __init__(self, trigger: Trigger, response: Response, cooldown_duration=600, mod_exempt=True):
+    def __init__(self, trigger: Trigger, response: IResponse, cooldown_duration=600, mod_exempt=True):
         self.response = response
         self.trigger = trigger
         self.cooldown_duration = cooldown_duration
