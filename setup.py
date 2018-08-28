@@ -3,9 +3,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("version.txt", "r") as vf:
+    version = vf.readline(1)
+
 setuptools.setup(
     name="botworks",
-    version="0.1.0",
+    version=version,
     author="William Hanson",
     author_email="42045551+doubleyuhtee@users.noreply.github.com",
     description="Slack bot framework",
