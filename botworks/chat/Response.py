@@ -6,31 +6,33 @@ class IResponse:
 
 
 class Response(IResponse):
-    def __init__(self, text=None, emoji=None, ghostly=None, threaded=None, method=None):
-        self.text = self.__to_list(text)
-        self.emojis = self.__to_list(emoji)
-        self.ghostly = self.__to_list(ghostly)
-        self.threaded_response = self.__to_list(threaded)
-        self.method = method
+    def __init__(self, text=None, emoji=None, ephemeral=None, threaded=None, method=None):
+        self.__text = self.__to_list(text)
+        self.__emoji = self.__to_list(emoji)
+        self.__ghostly = self.__to_list(ephemeral)
+        self.__threaded_response = self.__to_list(threaded)
+        self.__method = method
 
     def respond(self, client, payload):
-        if self.method:
-            self.method(client=client, payload=payload)
-        if self.text:
-            for t in self.text:
+        if self.__method:
+            self.__method(client=client, payload=payload)
+        if self.__text:
+            for t in self.__text:
                 client.post_message(channel=payload.channel, message=t)
-        if self.emojis:
-            for e in self.emojis:
-                client.react(payload, e)
-        if self.ghostly:
-            for e in self.ghostly:
-                client.ephemeral(payload, e)
-        if self.threaded_response:
-            for m in self.threaded_response:
-                client.thread_reply(payload, m)
+        if self.__emoji:
+            for e in self.__emoji:
+                client.react(payload=payload, reaction=e)
+        if self.__ghostly:
+            for e in self.__ghostly:
+                client.ephemeral_message(payload=payload, message=e)
+        if self.__threaded_response:
+            for m in self.__threaded_response:
+                client.thread_reply(payload=payload, message=m)
 
     @staticmethod
     def __to_list(o):
+        if not o:
+            return None
         if type(o) is list:
             return o
         return [o]
