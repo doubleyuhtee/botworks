@@ -39,30 +39,34 @@ class Payload:
         self.timestamp = rtm_message['ts']
         self.is_direct_message = str(rtm_message['channel']).startswith("D")
         self.isTargetedMessage = self.is_direct_message
-        if str(self.lower_message).startswith("<@" + str(bot_id) + ">"):
-            self.isTargetedMessage = True
-            self.lower_message = str(self.lower_message).replace("<@" + str(bot_id) + ">", "", 1).strip()
+        try:
+            if str(self.lower_message).startswith("<@" + str(bot_id) + ">"):
+                self.isTargetedMessage = True
+                self.lower_message = str(self.lower_message).replace("<@" + str(bot_id) + ">", "", 1).strip()
 
-        if 'file' in rtm_message and bot_token:
-            try:
-                url = rtm_message['file']['url_private_download']
-                log.info("Fetching image url: " + url)
-                auth_header = {"Authorization": "Bearer " + bot_token}
-                string = BytesIO(requests.get(url, headers=auth_header).content)
-                img = Image.open(string)
-                decoded_text = pytesseract.image_to_string(img)
-                self.imageText = decoded_text
+            if 'file' in rtm_message and bot_token:
+                try:
+                    url = rtm_message['file']['url_private_download']
+                    log.info("Fetching image url: " + url)
+                    auth_header = {"Authorization": "Bearer " + bot_token}
+                    string = BytesIO(requests.get(url, headers=auth_header).content)
+                    img = Image.open(string)
+                    decoded_text = pytesseract.image_to_string(img)
+                    self.imageText = decoded_text
 
-            except Exception as e:
-                log.error("Error parsing image text: " + str(e))
+                except Exception as e:
+                    log.error("Error parsing image text: " + str(e))
+                    self.imageText = None
+            else:
                 self.imageText = None
-        else:
-            self.imageText = None
 
-        if 'attachments' in rtm_message and len(rtm_message['attachments']) > 0:
-            self.sharedMessage = rtm_message['attachments'][0]
-        else:
-            self.sharedMessage = None
+            if 'attachments' in rtm_message and len(rtm_message['attachments']) > 0:
+                self.sharedMessage = rtm_message['attachments'][0]
+            else:
+                self.sharedMessage = None
+        except Exception as e:
+            log.warning("Caught exception " + str(e) + " while finalizing payload")
+        log.debug("Finalize finished")
 
 
 class PayloadFactory:
