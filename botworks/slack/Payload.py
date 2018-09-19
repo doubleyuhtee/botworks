@@ -66,7 +66,7 @@ class Payload:
                 self.sharedMessage = None
         except Exception as e:
             log.warning("Caught exception " + str(e) + " while finalizing payload")
-        log.debug("Finalize finished")
+        return self
 
 
 class PayloadFactory:
