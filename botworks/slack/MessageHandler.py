@@ -52,7 +52,6 @@ class MessageHandler:
                 log.error(e)
 
     def __get_channel_for_message(self, channel):
-        log.debug(json.dumps(self.__channels))
         for c in self.__channels:
             if c.channelId == channel:
                 return c
