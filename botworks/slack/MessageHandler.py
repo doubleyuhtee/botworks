@@ -41,6 +41,7 @@ class MessageHandler:
             try:
                 message_channel = self.__get_channel_for_message(payload.channel)
                 if message_channel:
+                    log.debug("checking responses in " + str(message_channel))
                     for m in message_channel.responses:
                         if m.check(payload, message_channel.mod_ids):
                             m.respond(self.__clacker, payload)

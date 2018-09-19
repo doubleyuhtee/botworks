@@ -35,7 +35,9 @@ class Botworks:
     def listen(self):
         clacker = Clack(self.botToken, self.botName, config=self.conf)
         for c in self.channels:
-            c.channelId = next(slack_channel for slack_channel in clacker.all_channels() if slack_channel['name'] and slack_channel['name'] == c.channelName)['id']
+            c.channelId = next(slack_channel for slack_channel in clacker.all_channels()
+                               if slack_channel['name'] and slack_channel['name'] == c.channelName)['id']
+            log.info("Monitoring " + c.channelName + " as " + c.channelId)
             for mod_name in c.mod_names:
                 mod_user = clacker.find_user_by_name(mod_name)
                 if mod_user and 'id' in mod_user:

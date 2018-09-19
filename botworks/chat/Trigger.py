@@ -16,6 +16,7 @@ class Trigger:
         self.fullTextRatio = full_text_ratio
 
     def check(self, payload: Payload):
+        log.debug("Checking " + str(payload.lower_message))
         if self.matchMethod:
             return self.matchMethod.check(payload)
         if self.event == payload.event_type:
