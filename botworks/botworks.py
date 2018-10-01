@@ -35,13 +35,17 @@ class Botworks:
     def listen(self):
         clacker = Clack(self.botToken, self.botName, config=self.conf)
         for c in self.channels:
-            c.channelId = next(slack_channel for slack_channel in clacker.all_channels()
-                               if slack_channel['name'] and slack_channel['name'] == c.channelName)['id']
-            log.info("Monitoring " + c.channelName + " as " + c.channelId)
-            for mod_name in c.mod_names:
-                mod_user = clacker.find_user_by_name(mod_name)
-                if mod_user and 'id' in mod_user:
-                    c.mod_ids.append(mod_user['id'])
+            try:
+                c.channelId = next(slack_channel for slack_channel in clacker.all_channels()
+                                   if slack_channel['name'] and slack_channel['name'] == c.channelName)['id']
+                log.info("Monitoring " + c.channelName + " as " + c.channelId)
+                for mod_name in c.mod_names:
+                    mod_user = clacker.find_user_by_name(mod_name)
+                    if mod_user and 'id' in mod_user:
+                        c.mod_ids.append(mod_user['id'])
+            except Exception as e:
+                self.channels.remove(c)
+                log.error("Unable to finalize " + str(c.channelName) + " " + str(e))
 
         message_handler = MessageHandler(clacker, channels=self.channels, config=self.conf)
         while True:
